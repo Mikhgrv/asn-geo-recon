@@ -30,7 +30,7 @@ ASN ──► announced BGP prefixes (RIPEstat)
 
 ### Quick start
 
-Python 3.8+, no packages needed for the basic mode:
+Python 3.8+ and **nothing else**: no pip, no virtualenv, in any mode.
 
 ```bash
 python3 src/asn_geo_recon.py --asn AS6849            # asks where to save; Enter = out
@@ -39,15 +39,19 @@ python3 src/asn_geo_recon.py --asn AS6849,AS15895 --expand-ips --out out
 python3 src/asn_geo_recon.py --help                  # all options with examples
 ```
 
-Geo filter (needs `pip install geoip2` and the free
-[GeoLite2-City.mmdb](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data)):
+Geo filter needs only the free
+[GeoLite2-City.mmdb](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) file
+(read by the bundled stdlib reader `src/mmdb.py`):
 
 ```bash
 python3 src/asn_geo_recon.py --asn AS6849 --oblast "Lviv" --geodb GeoLite2-City.mmdb --out out
 ```
 
+**Linux, one file:** `python3 scripts/build_pyz.py` packs everything into
+`dist/asn-geo-recon.pyz` (~16 KB); copy it anywhere and run `./asn-geo-recon.pyz --asn AS6849`.
+
 **Windows:** `scripts\build_exe.bat` builds a standalone console `dist\asn-geo-recon.exe`
-(Python and geoip2 bundled), or run without building via `scripts\run_cli.bat`.
+(Python bundled), or run without building via `scripts\run_cli.bat`.
 
 ### Output
 
@@ -66,7 +70,8 @@ Each run gets its own folder, e.g. `out/AS6849_Ukrtelecom/` or `out/AS6849_Ukrte
 ```
 src/asn_geo_recon.py   command-line program
 src/recon_core.py      core: RIPEstat, ASN search, geo filter, output
-scripts/               Windows build and run helpers
+src/mmdb.py            GeoLite2 .mmdb reader, standard library only
+scripts/               .pyz / .exe build and run helpers
 README.txt             full user guide (English + Ukrainian)
 ```
 
@@ -96,7 +101,7 @@ reliable than `--city`. See `README.txt` for the details of each confidence leve
 
 ### Швидкий старт
 
-Python 3.8+, для базового режиму нічого встановлювати не треба:
+Python 3.8+ і **більше нічого**: без pip і віртуального середовища, у будь-якому режимі.
 
 ```bash
 python3 src/asn_geo_recon.py --asn AS6849            # спитає, куди зберегти; Enter = out
@@ -104,7 +109,11 @@ python3 src/asn_geo_recon.py --search "kyivstar"
 python3 src/asn_geo_recon.py --asn AS6849 --oblast "Львівська" --geodb GeoLite2-City.mmdb --out out
 ```
 
-Для геофільтра потрібні `pip install geoip2` і безкоштовна база GeoLite2-City.mmdb з maxmind.com.
+Для геофільтра потрібен лише безкоштовний файл GeoLite2-City.mmdb з maxmind.com
+(його читає вбудований модуль `src/mmdb.py`).
+
+**Linux, один файл:** `python3 scripts/build_pyz.py` → `dist/asn-geo-recon.pyz` (~16 КБ),
+копіюєте куди завгодно й запускаєте `./asn-geo-recon.pyz --asn AS6849`.
 
 **Windows:** `scripts\build_exe.bat` збирає самостійний консольний `dist\asn-geo-recon.exe`.
 
