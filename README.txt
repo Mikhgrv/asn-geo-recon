@@ -89,7 +89,7 @@ USAGE
 
 BUILDING THE EXE (Windows)
 --------------------------------------------------------------------------------
-  1) run scriptsuild_exe.bat (double-click or from cmd, any folder);
+  1) run scripts\build_exe.bat (double-click or from cmd, any folder);
   2) wait until it finishes;
   3) result:  dist\asn-geo-recon.exe
   4) the exe runs without Python installed. It is a CONSOLE program: start it
@@ -182,7 +182,7 @@ ETHICS AND LAW
 --------------------------------------------------------------------------------
   src/asn_geo_recon.py    програма, яку запускають (CLI, повний --help)
   src/recon_core.py       ядро (збір, геофільтр, запис результатів)
-  scripts/build_exe.bat   збірка в один distsn-geo-recon.exe (Windows)
+  scripts/build_exe.bat   збірка в один dist\asn-geo-recon.exe (Windows)
   scripts/run_cli.bat     запуск на Windows без збірки
   out/                    результати, окрема тека на кожен запуск
   dist/                   зібраний exe
@@ -236,7 +236,7 @@ ETHICS AND LAW
 
 ЗБІРКА EXE (Windows)
 --------------------------------------------------------------------------------
-  1) запустіть scriptsuild_exe.bat (подвійним кліком або з cmd, з будь-якої теки);
+  1) запустіть scripts\build_exe.bat (подвійним кліком або з cmd, з будь-якої теки);
   2) дочекайтеся завершення;
   3) результат:  dist\asn-geo-recon.exe
   4) exe працює без встановленого Python. Це КОНСОЛЬНА програма: запускайте
