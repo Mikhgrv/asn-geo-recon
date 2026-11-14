@@ -10,9 +10,8 @@ Passive pipeline (NO network scanning):
 All data comes from OPEN BGP registries. Not a single packet is sent to the
 operator's network - this is not a scanner.
 
-Dependencies:
-    - ASN mode: Python 3.8+ standard library only;
-    - city/oblast mode: geoip2 + a GeoLite2-City.mmdb database.
+Dependencies: Python 3.8+ standard library only. City/oblast mode also needs
+a GeoLite2-City.mmdb file, read by the bundled mmdb module.
 """
 import json
 import ipaddress
@@ -24,7 +23,9 @@ import socket
 import os
 import time
 
-__version__ = "1.1"
+import mmdb
+
+__version__ = "1.2"
 
 RIPESTAT_BASE = "https://stat.ripe.net/data"
 RIPESTAT_PREFIXES = RIPESTAT_BASE + "/announced-prefixes/data.json?resource=AS{asn}"
@@ -357,19 +358,16 @@ def _sort_prefixes(prefixes):
 
 
 # ---------------------------------------------------------------------------
-# Stage 2: geo filter (optional, needs geoip2 + GeoLite2-City.mmdb)
+# Stage 2: geo filter (optional, needs a GeoLite2-City.mmdb file)
 # ---------------------------------------------------------------------------
 def _open_geodb(path):
-    try:
-        import geoip2.database  # noqa
-    except ImportError:
-        raise ReconError(
-            "City/oblast mode needs the geoip2 package "
-            "(pip install geoip2) and a GeoLite2-City.mmdb database.")
+    """Open the database with the bundled stdlib reader (no geoip2 needed)."""
     if not path or not os.path.isfile(path):
         raise ReconError("GeoLite2-City.mmdb not found at: %r" % path)
-    import geoip2.database
-    return geoip2.database.Reader(path)
+    try:
+        return mmdb.Reader(path)
+    except (mmdb.InvalidDatabaseError, OSError) as e:
+        raise ReconError("Cannot read %r as a MaxMind database: %s" % (path, e))
 
 
 def _norm_oblast(oblast):
@@ -425,13 +423,23 @@ def _geo_target(city, oblast):
     return t
 
 
-def _region_code(r):
-    """Subdivision ISO code as 'UA-46' (GeoLite2 stores only '46')."""
-    code = (r.subdivisions.most_specific.iso_code or "").upper()
-    country = (r.country.iso_code or "").upper()
-    if code and country and "-" not in code:
+def _record_fields(rec):
+    """
+    Pull what the classifier needs out of a raw GeoLite2-City record (dict).
+    -> (city_en_lower, region_code like 'UA-46', region_name, country_iso).
+    The most specific subdivision is the last one in the list.
+    """
+    if not rec:
+        return "", "", "", ""
+    city = ((rec.get("city") or {}).get("names") or {}).get("en") or ""
+    country = ((rec.get("country") or {}).get("iso_code") or "").upper()
+    subs = rec.get("subdivisions") or [{}]
+    sub = subs[-1] or {}
+    region_name = (sub.get("names") or {}).get("en") or ""
+    code = (sub.get("iso_code") or "").upper()
+    if code and country and "-" not in code:      # GeoLite2 stores only '46'
         code = "%s-%s" % (country, code)
-    return code
+    return city.lower(), code, region_name, country
 
 
 def _classify(city_en, region_code, region_name, tgt):
@@ -461,37 +469,20 @@ def _classify(city_en, region_code, region_name, tgt):
     return "doubtful"
 
 
-# Step used when the database does not report the bounds of its record.
-_GEO_FALLBACK_STEP = {4: 2 ** 8, 6: 2 ** 96}   # /24 for IPv4, /32 for IPv6
-
-
 def _walk_geo(reader, prefix):
     """
-    Walk a prefix record by record: each lookup returns the record's network
-    (traits.network), so the next lookup starts right after it. Geo data is
-    thus taken for EVERY part of the prefix, not just its first address.
+    Walk a prefix record by record: each lookup also returns the network the
+    database record covers, so the next lookup starts right after it. Geo data
+    is thus taken for EVERY part of the prefix, not just its first address.
     Yields (start_int, end_int, city, region_code, region_name, country).
     """
     net = ipaddress.ip_network(prefix)
     addr_cls = ipaddress.IPv4Address if net.version == 4 else ipaddress.IPv6Address
-    step = _GEO_FALLBACK_STEP[net.version]
     cur, end = int(net.network_address), int(net.broadcast_address)
     while cur <= end:
-        city_en = region_code = region_name = country = ""
-        rec_net = None
-        try:
-            r = reader.city(str(addr_cls(cur)))
-            rec_net = getattr(r.traits, "network", None)
-            city_en = (r.city.name or "").lower()
-            region_code = _region_code(r)
-            region_name = r.subdivisions.most_specific.name or ""
-            country = r.country.iso_code or ""
-        except Exception as e:  # AddressNotFoundError carries .network as well
-            rec_net = getattr(e, "network", None)
-        if rec_net is not None:
-            nxt = int(ipaddress.ip_network(rec_net, strict=False).broadcast_address) + 1
-        else:
-            nxt = (cur // step + 1) * step
+        rec, rec_net = reader.lookup(str(addr_cls(cur)))
+        city_en, region_code, region_name, country = _record_fields(rec)
+        nxt = int(rec_net.broadcast_address) + 1
         seg_end = min(max(nxt, cur + 1) - 1, end)
         yield cur, seg_end, city_en, region_code, region_name, country
         cur = seg_end + 1

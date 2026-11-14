@@ -36,24 +36,25 @@ CONTENTS
   ├── .gitignore
   ├── src/                # program code
   │   ├── asn_geo_recon.py    # the program you run (CLI)
-  │   └── recon_core.py       # core library
-  ├── scripts/            # Windows helpers
-  │   ├── build_exe.bat       # build dist\asn-geo-recon.exe
-  │   └── run_cli.bat         # run without building
+  │   ├── recon_core.py       # core library
+  │   ├── mmdb.py             # GeoLite2 .mmdb reader (stdlib only)
+  │   └── __main__.py         # entry point of the .pyz build
+  ├── scripts/            # build and run helpers
+  │   ├── build_pyz.py        # one-file dist/asn-geo-recon.pyz (Linux/any OS)
+  │   ├── build_exe.bat       # build dist\asn-geo-recon.exe (Windows)
+  │   └── run_cli.bat         # run without building (Windows)
   ├── out/                # results, one folder per run (not in git)
-  └── dist/               # built exe (not in git)
+  └── dist/               # built .pyz / .exe (not in git)
 
 
 REQUIREMENTS
 --------------------------------------------------------------------------------
   - Python 3.8 or newer (not needed for the prebuilt .exe).
-  - BASIC mode (--asn, --search): nothing else, standard library only.
-    Internet access is enough.
-  - CITY/OBLAST mode additionally needs:
-        pip install geoip2
-    and the free MaxMind GeoLite2-City.mmdb database
-    (sign up at maxmind.com -> GeoLite2 -> download City .mmdb).
-    The prebuilt .exe already contains geoip2; only the .mmdb is needed.
+  - NO packages to install, in any mode: standard library only.
+    No pip, no virtualenv. Internet access is enough.
+  - CITY/OBLAST mode additionally needs the free MaxMind GeoLite2-City.mmdb
+    file (sign up at maxmind.com -> GeoLite2 -> download City .mmdb).
+    It is read by the bundled src/mmdb.py reader.
 
 
 USAGE
@@ -85,6 +86,17 @@ USAGE
 
   City and oblast names are accepted in English or Ukrainian ("Lviv" / "Львів").
   For oblast mode "Kyiv" means Kyiv oblast; use "Kyiv city" for the city itself.
+
+
+LINUX: ONE FILE, NOTHING TO INSTALL
+--------------------------------------------------------------------------------
+  Any Linux with python3 (preinstalled on Ubuntu, Debian, Fedora, ...):
+      python3 src/asn_geo_recon.py --asn AS6849
+
+  Or pack the program into a single file and copy it anywhere:
+      python3 scripts/build_pyz.py          # -> dist/asn-geo-recon.pyz (~16 KB)
+      ./dist/asn-geo-recon.pyz --asn AS6849
+      python3 asn-geo-recon.pyz --help      # if the file lost its executable bit
 
 
 BUILDING THE EXE (Windows)
@@ -182,23 +194,24 @@ ETHICS AND LAW
 --------------------------------------------------------------------------------
   src/asn_geo_recon.py    програма, яку запускають (CLI, повний --help)
   src/recon_core.py       ядро (збір, геофільтр, запис результатів)
+  src/mmdb.py             читач бази GeoLite2 .mmdb (лише stdlib)
+  src/__main__.py         точка входу для збірки .pyz
+  scripts/build_pyz.py    один файл dist/asn-geo-recon.pyz (Linux/будь-яка ОС)
   scripts/build_exe.bat   збірка в один dist\asn-geo-recon.exe (Windows)
   scripts/run_cli.bat     запуск на Windows без збірки
   out/                    результати, окрема тека на кожен запуск
-  dist/                   зібраний exe
+  dist/                   зібрані .pyz / .exe
   README.txt              цей файл
 
 
 ВИМОГИ
 --------------------------------------------------------------------------------
   - Python 3.8 або новіший (для готового .exe не потрібен).
-  - БАЗОВИЙ режим (--asn, --search): більше нічого, лише стандартна бібліотека.
-    Достатньо доступу до інтернету.
-  - Режим МІСТА/ОБЛАСТІ додатково:
-        pip install geoip2
-    та безкоштовна база MaxMind GeoLite2-City.mmdb
-    (реєстрація на maxmind.com -> GeoLite2 -> завантажити City .mmdb).
-    Готовий .exe уже містить geoip2; потрібна лише .mmdb.
+  - ЖОДНИХ пакетів встановлювати не треба, у будь-якому режимі: лише
+    стандартна бібліотека. Без pip і без віртуального середовища.
+  - Режим МІСТА/ОБЛАСТІ додатково потребує безкоштовного файлу MaxMind
+    GeoLite2-City.mmdb (реєстрація на maxmind.com -> GeoLite2 -> City .mmdb).
+    Його читає вбудований модуль src/mmdb.py.
 
 
 ЗАПУСК
@@ -232,6 +245,17 @@ ETHICS AND LAW
   Назви міст і областей приймаються українською або англійською
   ("Львів" / "Lviv"). Для м. Київ як області - "Київ" або "Kyiv city";
   "Київська" / "Kyiv" - це Київська область.
+
+
+LINUX: ОДИН ФАЙЛ, НІЧОГО НЕ ВСТАНОВЛЮВАТИ
+--------------------------------------------------------------------------------
+  Будь-який Linux з python3 (є з коробки в Ubuntu, Debian, Fedora, ...):
+      python3 src/asn_geo_recon.py --asn AS6849
+
+  Або запакувати програму в один файл і скопіювати куди завгодно:
+      python3 scripts/build_pyz.py          # -> dist/asn-geo-recon.pyz (~16 КБ)
+      ./dist/asn-geo-recon.pyz --asn AS6849
+      python3 asn-geo-recon.pyz --help      # якщо файл втратив право на запуск
 
 
 ЗБІРКА EXE (Windows)

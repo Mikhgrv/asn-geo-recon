@@ -1,11 +1,9 @@
-# Basic mode (--asn, --search) needs no dependencies - standard library only.
+# The program needs NO third-party packages: Python 3.8+ standard library only.
+# The geo filter reads GeoLite2-City.mmdb with the bundled src/mmdb.py.
 #
-# Optional dependencies below:
-#   geoip2       - only for --city / --oblast (geo filter); >=4.0 needed for
-#                  record-by-record prefix walking (traits.network)
-#   pyinstaller  - only for building the exe (dev dependency)
+# Only for building the Windows exe (scripts\build_exe.bat installs it itself):
+#   pyinstaller
 #
-# Install: pip install -r requirements.txt
+# Install (optional, Windows build only): pip install -r requirements.txt
 
-geoip2>=4.8.0
 pyinstaller>=6.0
