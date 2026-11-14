@@ -1,0 +1,9 @@
+# Keep line endings stable across Windows and Linux.
+# Python/text files use LF (a CRLF shebang breaks ./script.py on Linux);
+# .bat files need CRLF for cmd.exe.
+* text=auto
+*.py text eol=lf
+*.txt text eol=lf
+*.bat text eol=crlf
+*.exe binary
+*.mmdb binary

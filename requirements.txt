@@ -1,0 +1,11 @@
+# Basic mode (--asn, --search) needs no dependencies - standard library only.
+#
+# Optional dependencies below:
+#   geoip2       - only for --city / --oblast (geo filter); >=4.0 needed for
+#                  record-by-record prefix walking (traits.network)
+#   pyinstaller  - only for building the exe (dev dependency)
+#
+# Install: pip install -r requirements.txt
+
+geoip2>=4.8.0
+pyinstaller>=6.0

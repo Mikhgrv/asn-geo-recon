@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# PyInstaller (work dir + spec in build/, exe in dist/)
+build/
+dist/
+*.spec
+
+# Tool output
+out/
+
+# Local offline tests (kept on disk, not published)
+tests/
+
+# GeoLite2 database is not committed (large, MaxMind licence).
+# Note: comments must be on their own line - "*.mmdb  # ..." does not match.
+*.mmdb
+
+# Claude Code instructions and settings (local only, not part of the project)
+CLAUDE.md
+.claude/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
