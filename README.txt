@@ -41,8 +41,7 @@ CONTENTS
   │   └── __main__.py         # entry point of the .pyz build
   ├── scripts/            # build and run helpers
   │   ├── build_pyz.py        # one-file dist/asn-geo-recon.pyz (Linux/any OS)
-  │   ├── build_exe.bat       # build dist\asn-geo-recon.exe (Windows)
-  │   └── run_cli.bat         # run without building (Windows)
+  │   └── build_exe.bat       # build dist\asn-geo-recon.exe (Windows)
   ├── out/                # results, one folder per run (not in git)
   └── dist/               # built .pyz / .exe (not in git)
 
@@ -198,7 +197,6 @@ ETHICS AND LAW
   src/__main__.py         точка входу для збірки .pyz
   scripts/build_pyz.py    один файл dist/asn-geo-recon.pyz (Linux/будь-яка ОС)
   scripts/build_exe.bat   збірка в один dist\asn-geo-recon.exe (Windows)
-  scripts/run_cli.bat     запуск на Windows без збірки
   out/                    результати, окрема тека на кожен запуск
   dist/                   зібрані .pyz / .exe
   README.txt              цей файл

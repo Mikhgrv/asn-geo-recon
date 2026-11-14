@@ -51,7 +51,7 @@ python3 src/asn_geo_recon.py --asn AS6849 --oblast "Lviv" --geodb GeoLite2-City.
 `dist/asn-geo-recon.pyz` (~16 KB); copy it anywhere and run `./asn-geo-recon.pyz --asn AS6849`.
 
 **Windows:** `scripts\build_exe.bat` builds a standalone console `dist\asn-geo-recon.exe`
-(Python bundled), or run without building via `scripts\run_cli.bat`.
+(Python bundled).
 
 ### Output
 
