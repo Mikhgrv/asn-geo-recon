@@ -72,11 +72,23 @@ src/asn_geo_recon.py   command-line program
 src/recon_core.py      core: RIPEstat, ASN search, geo filter, output
 src/mmdb.py            GeoLite2 .mmdb reader, standard library only
 scripts/               .pyz / .exe build and run helpers
-README.txt             full user guide (English + Ukrainian)
 ```
 
-City-level geolocation is unreliable (bias towards Kyiv, centroids); `--oblast` is more
-reliable than `--city`. See `README.txt` for the details of each confidence level.
+### Geolocation accuracy
+
+City-level geolocation is unreliable: operators register address space at their head
+office (bias towards Kyiv), and blocks with an unknown city land on an arbitrary point
+(centroids). `--oblast` is more reliable than `--city`. Every part of a prefix gets one of
+three confidence levels:
+
+| Level | Meaning |
+|---|---|
+| `confirmed` | match at the target level (city for `--city`, oblast for `--oblast`) |
+| `probable` | match only at a coarser level (`--city`: the city's oblast; `--oblast`: a city of that oblast when the record has no oblast) |
+| `doubtful` | unknown or contradictory (likely a centroid) |
+
+`confirmed` + `probable` go to the output by default; add `doubtful` with `--include-doubtful`.
+For oblast mode `Kyiv` means Kyiv oblast; use `Kyiv city` for the city itself.
 
 ---
 
@@ -123,4 +135,17 @@ python3 src/asn_geo_recon.py --asn AS6849 --oblast "Львівська" --geodb 
 `ips.txt` (усі адреси, з `--expand-ips`), `report.txt` (статистика).
 `ips.txt` — це **потенційний** адресний простір, а не перелік активних вузлів.
 
-Повна інструкція англійською та українською — у [`README.txt`](README.txt).
+### Точність геолокації
+
+Прив'язка до **міста** ненадійна: оператори реєструють простір на головний офіс (зміщення
+на Київ), а блоки з невизначеним містом звалюються в умовну точку (центроїди). Режим
+`--oblast` надійніший за `--city`. Кожна частина префікса отримує один із рівнів довіри:
+
+| Рівень | Значення |
+|---|---|
+| `confirmed` | збіг на рівні цілі (місто для `--city`, область для `--oblast`) |
+| `probable` | збіг лише на грубішому рівні (`--city` — область міста; `--oblast` — місто області, коли область у записі не вказана) |
+| `doubtful` | не визначено або суперечить (ймовірний центроїд) |
+
+За замовчуванням у вихід ідуть `confirmed` + `probable`; додати сумнівні — `--include-doubtful`.
+Для області `Київська` / `Kyiv` — це Київська область; саме місто — `Київ` або `Kyiv city`.
